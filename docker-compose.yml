@@ -1,0 +1,16 @@
+services:
+  auth:
+    build:
+      context: ./Auth/auth
+    ports:
+      - "4000:3000"
+    environment:
+      - NODE_ENV=production
+
+  shipment:
+    build:
+      context: ./Shipment/shipment
+    ports:
+      - "4001:5000"  
+    environment:
+      - NODE_ENV=production

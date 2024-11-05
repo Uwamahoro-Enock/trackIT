@@ -15,7 +15,7 @@ COPY . .
 RUN npm run build
 
 # Expose the port for the shipment service (e.g., 3001)
-EXPOSE 5000
+EXPOSE 8001
 
 # Start the application
 CMD ["npm", "run", "start:prod"]

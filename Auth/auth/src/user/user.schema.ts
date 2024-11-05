@@ -2,7 +2,7 @@ import { Field, ID, ObjectType } from '@nestjs/graphql';
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
-@ObjectType()
+@ObjectType() 
 @Schema()
 export class User extends Document {
   @Field(() => ID)
@@ -17,6 +17,7 @@ export class User extends Document {
   email: string;
 
   @Prop({ required: true })
+  @Field()
   password: string;
 
   @Prop({ default: Date.now })

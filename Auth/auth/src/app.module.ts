@@ -4,16 +4,19 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { connection } from 'mongoose'; // Import mongoose connection
+import { ApolloFederationDriver, ApolloFederationDriverConfig } from '@nestjs/apollo';
+import { connection } from 'mongoose';
 import { ConfigModule } from '@nestjs/config';
+
 @Module({
   imports: [
     ConfigModule.forRoot(),
     MongooseModule.forRoot(process.env.MONGO_URI),
-    GraphQLModule.forRoot<ApolloDriverConfig>({
-      driver: ApolloDriver,
+    GraphQLModule.forRoot<ApolloFederationDriverConfig>({
+      driver: ApolloFederationDriver,
       autoSchemaFile: true,
+      playground: true,
+      introspection: true,
     }),
     UserModule,
   ],
@@ -22,9 +25,8 @@ import { ConfigModule } from '@nestjs/config';
 })
 export class AppModule implements OnModuleInit {
   async onModuleInit() {
-    // Log the connection status
     connection.once('open', () => {
-      console.log('Connected to authors database');
+      console.log('Connected to database');
     });
   }
 }

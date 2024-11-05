@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@apollo/subgraph": "^2.9.3",
+    "@nestjs/graphql": "^12.2.1"
+  }
+}

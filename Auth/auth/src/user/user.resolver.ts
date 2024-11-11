@@ -1,22 +1,28 @@
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import { Resolver, Mutation, Args } from '@nestjs/graphql';
 import { UserService } from './user.service';
-import { User } from './user.schema';
+import { RegisterDto } from 'src/dto/register.dto';
+import { TokenResponse } from 'src/dto/token-response.dto';
+import { LoginDto } from 'src/dto/login.dto';
 
-@Resolver(() => User)
+@Resolver()
 export class UserResolver {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+  ) {}
 
-  @Query(() => User, { name: 'user' })
-  async getUser(@Args('id') id: string) {
-    return this.userService.findById(id);
+  @Mutation(() => TokenResponse)
+  async register(@Args('registerDto') registerDto: RegisterDto): Promise<TokenResponse> {
+    const { token } = await this.userService.register(registerDto);
+    return { token };
   }
 
-  @Mutation(() => User)
-  async register(
-    @Args('username') username: string,
-    @Args('email') email: string,
-    @Args('password') password: string,
-  ) {
-    return this.userService.register({ username, email, password });
+
+  @Mutation(() => TokenResponse)
+  async login(@Args('loginDto') loginDto: LoginDto): Promise<TokenResponse> {
+    const { token } = await this.userService.login(loginDto);
+    console.log('user successfully logged in')
+    return { token };
   }
+    
+
 }

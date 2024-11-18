@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package shipment;
+
+service ShipmentService {
+  rpc FindAll (Empty) returns (ShipmentList);
+  rpc FindOne (FindOneRequest) returns (ShipmentResponse);
+  rpc Create (CreateShipmentRequest) returns (ShipmentResponse);
+}
+
+message Empty {}
+
+message Shipment {
+  string id = 1;
+  string trackingNumber = 2;
+  string origin = 3;
+  string destination = 4;
+  string status = 5;
+}
+
+message ShipmentList {
+  repeated Shipment shipments = 1;
+}
+
+message FindOneRequest {
+  string trackingNumber = 1;
+}
+
+message CreateShipmentRequest {
+  string trackingNumber = 1;
+  string origin = 2;
+  string destination = 3;
+  string status = 4;
+}
+
+message ShipmentResponse {
+  Shipment shipment = 1;
+}

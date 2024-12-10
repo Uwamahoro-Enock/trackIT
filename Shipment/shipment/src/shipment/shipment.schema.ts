@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Field, ObjectType, ID } from '@nestjs/graphql';
+import { Field, ObjectType, ID, Directive } from '@nestjs/graphql';
 import { Document } from 'mongoose';
 
 @ObjectType()
@@ -7,7 +7,7 @@ import { Document } from 'mongoose';
 export class Shipment extends Document {
 
   @Field(() => ID)
-  id: string
+  id: string;
 
   @Field()
   @Prop({ required: true })

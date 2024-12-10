@@ -14,7 +14,7 @@ export class AppModule implements OnModuleInit {
     this.gateway = new ApolloGateway({
       supergraphSdl: new IntrospectAndCompose({
         subgraphs: [
-          { name: 'auth', url: 'http://localhost:3000/graphql' },
+          { name: 'auth', url: 'http://localhost:3000/graphql'},
           {name: 'shipment', url: 'http://localhost:8000/graphql'}
         ],
       }),

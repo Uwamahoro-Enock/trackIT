@@ -4,7 +4,7 @@ import { AppService } from './app.service';
 import { AppController } from './app.controller';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ShipmentModule } from './shipment/shipment.module';
-import { ApolloFederationDriver, ApolloFederationDriverConfig } from '@nestjs/apollo';
+import { ApolloDriver, ApolloFederationDriverConfig } from '@nestjs/apollo';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
@@ -12,7 +12,7 @@ import { ConfigModule } from '@nestjs/config';
     ConfigModule.forRoot(),
     MongooseModule.forRoot(process.env.MONGO_URI),
     GraphQLModule.forRoot<ApolloFederationDriverConfig>({
-      driver: ApolloFederationDriver,
+      driver: ApolloDriver,
       autoSchemaFile: true,
       introspection: true,
     }),

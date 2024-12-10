@@ -7,6 +7,8 @@ import { UserModule } from './user/user.module';
 import { ApolloFederationDriver, ApolloFederationDriverConfig } from '@nestjs/apollo';
 import { connection } from 'mongoose';
 import { ConfigModule } from '@nestjs/config';
+import {ClientsModule, Transport} from '@nestjs/microservices'
+import { join } from 'path';
 
 @Module({
   imports: [

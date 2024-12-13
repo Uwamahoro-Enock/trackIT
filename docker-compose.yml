@@ -1,17 +1,31 @@
 services:
   auth:
     build:
-      context: ./Auth/auth
-      dockerfile: ./Dockerfile
+      context: ./Auth/auth  # The directory containing the Dockerfile and the app's source code
+      dockerfile: Dockerfile  # Just specify the filename, not the full path
     ports:
-      - "4000:3000"
+      - "3000:3001"
     environment:
       - NODE_ENV=production
+    depends_on:
+      - shipment
 
   shipment:
     build:
-      context: ./Shipment/shipment
+      context: ./Shipment/shipment  # The directory containing the Dockerfile and the app's source code
+      dockerfile: Dockerfile  # Just specify the filename
     ports:
-      - "8000:8001"  
+      - "8000:8001"
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - gateway
+
+  gateway:
+    build:
+      context: ./gateway-service  # The directory containing the Dockerfile and the app's source code
+      dockerfile: Dockerfile  # Just specify the filename
+    ports:
+      - "4000:4001"
     environment:
       - NODE_ENV=production

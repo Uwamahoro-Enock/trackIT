@@ -1,21 +1,22 @@
-# Start with the official Node.js image
-FROM node:16
+# Dockerfile 
 
-# Create app directory in container
+FROM node:16-alpine
+
+# Set working directory in container
 WORKDIR /usr/src/app
 
-# Install app dependencies
+# Copy package.json and install dependencies
 COPY package*.json ./
 RUN npm install
 
-# Copy the rest of the app’s source code
+# Copy the rest of the application source code
 COPY . .
 
-# Build the NestJS application
+# Build the NestJS application (or other build command)
 RUN npm run build
 
-# Expose the port for the shipment service (e.g., 3001)
-EXPOSE 8001
+# Expose the correct port
+EXPOSE 8000
 
-# Start the application
+# Command to start the application
 CMD ["npm", "run", "start:prod"]

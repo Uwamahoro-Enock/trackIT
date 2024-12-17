@@ -1,5 +1,5 @@
 import { Module, OnModuleInit } from '@nestjs/common';
-import { ApolloGateway, IntrospectAndCompose } from '@apollo/gateway';
+import { ApolloGateway, IntrospectAndCompose, RemoteGraphQLDataSource } from '@apollo/gateway';
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
 import * as express from 'express';
@@ -14,10 +14,23 @@ export class AppModule implements OnModuleInit {
     this.gateway = new ApolloGateway({
       supergraphSdl: new IntrospectAndCompose({
         subgraphs: [
-          { name: 'auth', url: 'http://localhost:3000/graphql'},
-          {name: 'shipment', url: 'http://localhost:8000/graphql'}
+          { name: 'auth', url: 'http://localhost:3000/graphql' },
+          { name: 'shipment', url: 'http://localhost:8000/graphql' },
         ],
       }),
+      // Add custom RemoteGraphQLDataSource to handle forwarding the Authorization header
+      buildService: ({ url }) =>
+        new RemoteGraphQLDataSource({
+          url,
+          willSendRequest({ request, context }) {
+            if (context?.req?.headers?.authorization) {
+              request.http.headers.set(
+                'Authorization',
+                context.req.headers.authorization
+              );
+            }
+          },
+        }),
     });
 
     this.server = new ApolloServer({
@@ -31,8 +44,14 @@ export class AppModule implements OnModuleInit {
     app.use(cors());
     app.use(express.json());
 
+    // Pass the request object to the context
     await this.server.start();
-    app.use('/graphql', expressMiddleware(this.server));
+    app.use(
+      '/graphql',
+      expressMiddleware(this.server, {
+        context: async ({ req }) => ({ req }), // Include the request in the context
+      })
+    );
 
     const port = 4000;
     app.listen(port, () => {

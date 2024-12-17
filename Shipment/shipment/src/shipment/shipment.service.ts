@@ -16,6 +16,10 @@ export class ShipmentService {
     return this.shipmentModel.findOne({ trackingNumber }).exec();
   }
 
+  async findByUser(userId: string): Promise<Shipment[]> {
+    return this.shipmentModel.find({ userId: userId }).exec();
+  }
+
   async create(input: CreateShipmentInput): Promise<Shipment> {
     const newShipment = new this.shipmentModel(input);
     return newShipment.save();

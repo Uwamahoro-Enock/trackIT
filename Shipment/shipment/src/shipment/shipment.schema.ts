@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Field, ObjectType, ID, Directive } from '@nestjs/graphql';
+import { Field, ObjectType, ID } from '@nestjs/graphql';
 import { Document } from 'mongoose';
 
 @ObjectType()
@@ -28,6 +28,14 @@ export class Shipment extends Document {
   @Field()
   @Prop({ default: Date.now })
   createdAt: Date;
+
+  @Field()
+  @Prop({required: true})
+  userId: string	
+
+  @Field(() => [String])
+  @Prop({type: [String], default: []})
+  statusHistory: string[];
 }
 
 export const ShipmentSchema = SchemaFactory.createForClass(Shipment);

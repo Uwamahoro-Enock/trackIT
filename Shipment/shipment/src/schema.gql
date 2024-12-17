@@ -2,16 +2,6 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-directive @key(fields: String!) on OBJECT | INTERFACE
-
-directive @extends on OBJECT | INTERFACE
-
-directive @external on OBJECT | FIELD_DEFINITION
-
-directive @requires(fields: String!) on FIELD_DEFINITION
-
-directive @provides(fields: String!) on FIELD_DEFINITION
-
 type Shipment {
   id: ID!
   trackingNumber: String!
@@ -19,6 +9,8 @@ type Shipment {
   origin: String!
   destination: String!
   createdAt: DateTime!
+  userId: String!
+  statusHistory: [String!]!
 }
 
 """
@@ -28,6 +20,7 @@ scalar DateTime
 
 type Query {
   shipments: [Shipment!]!
+  usershipments(userId: String!): [Shipment!]!
   shipment(trackingNumber: String!): Shipment
 }
 
@@ -40,4 +33,5 @@ input CreateShipmentInput {
   status: String!
   origin: String!
   destination: String!
+  userId: String!
 }

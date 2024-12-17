@@ -13,4 +13,8 @@ export class CreateShipmentInput {
 
   @Field()
   destination: string;
+
+  @Field()
+  userId: string;
+
 }

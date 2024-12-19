@@ -26,6 +26,7 @@ import { JwtStrategy } from './jwt/jwt.shipment';
 
     // GraphQL with Apollo driver
     GraphQLModule.forRoot<ApolloDriverConfig>({
+      context	: ({ req }) => ({ req }),
       driver: ApolloFederationDriver,
       autoSchemaFile: {path:join(process.cwd(), 'src/schema.gql'),
       federation: 2

@@ -24,10 +24,9 @@ export class AppModule implements OnModuleInit {
           url,
           willSendRequest({ request, context }) {
             if (context?.req?.headers?.authorization) {
-              request.http.headers.set(
-                'Authorization',
-                context.req.headers.authorization
-              );
+              const token = context.req.headers.authorization;
+              request.http.headers.set('Authorization', `Bearer ${token}`);
+              console.log('Forwarding token:   ', token);
             }
           },
         }),
@@ -49,7 +48,9 @@ export class AppModule implements OnModuleInit {
     app.use(
       '/graphql',
       expressMiddleware(this.server, {
-        context: async ({ req }) => ({ req }), // Include the request in the context
+        context:async function({ req }) {
+          return { req };
+        },
       })
     );
 

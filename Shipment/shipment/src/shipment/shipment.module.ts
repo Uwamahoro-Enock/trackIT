@@ -31,7 +31,7 @@ import { JwtStrategy } from './jwt/jwt.shipment';
       autoSchemaFile: {path:join(process.cwd(), 'src/schema.gql'),
       federation: 2
       },
-      introspection: true,
+      introspection: true, 
       playground: true,
       path: '/graphql', 
     }),

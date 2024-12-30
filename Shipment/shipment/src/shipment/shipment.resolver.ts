@@ -1,56 +1,104 @@
 import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
 import { ShipmentService } from './shipment.service';
 import { Shipment } from './shipment.schema';
-import { UseGuards } from '@nestjs/common';
+import { UnauthorizedException, UseGuards, ForbiddenException } from '@nestjs/common';
 import { AuthGuard } from './jwt/auth.guard';
+import { RolesGuard } from './jwt/role.guard';
+import { Roles } from './jwt/role.decorator';
 import { CreateShipmentInput } from './dto/create-shipment.input';
+import { UpdateShipmentInput } from './dto/update-shipment.input';
+import { Role } from './dto/role.enum';
 
-@Resolver(of => Shipment)
+@Resolver(() => Shipment)
 export class ShipmentResolver {
-  constructor(private shipmentService: ShipmentService) {}
+  constructor(private readonly shipmentService: ShipmentService) {}
 
-  // Get all shipments (protected route)
-  
+  // Get all shipments (Admin only)
   @Query(() => [Shipment])
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.Admin)
   async shipments(@Context() context: any) {
     console.log('User from token:', context.req.user);
     return await this.shipmentService.findAll();
   }
 
-  // Get shipments for a specific user (protected route)
-  @UseGuards(AuthGuard)
-  @Query(returns => [Shipment])
+  // Get shipments for a specific user (User or Admin)
+  @Query(() => [Shipment])
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.User, Role.Admin)
   async usershipments(
-    @Args('userId') userId: string, 
+    @Args('userId') userId: string,
     @Context() context: any
   ) {
-    const tokenUserId = context.req.user.userId; // Extract userId from the token
+    const tokenUserId = context.req.user.userId; 
+    const userRole = context.req.user.role;
     console.log('User ID from token:', tokenUserId);
 
-    if (tokenUserId !== userId) {
-      throw new Error('Unauthorized access to user shipments');
+    // Allow only if the user is the owner or has an admin role
+    if (tokenUserId !== userId && userRole !== Role.Admin) {
+      throw new ForbiddenException('Unauthorized access to user shipments');
     }
 
     return this.shipmentService.findByUser(userId);
   }
 
   // Get a specific shipment by tracking number (unprotected route)
-  @Query(returns => Shipment, { nullable: true })
+  @Query(() => Shipment, { nullable: true })
   async shipment(@Args('trackingNumber') trackingNumber: string) {
     return this.shipmentService.findOne(trackingNumber);
   }
 
-  // Create a shipment (protected route)
-  @UseGuards(AuthGuard)
-  @Mutation(returns => Shipment)
+  // Create a shipment (User or Admin)
+  @Mutation(() => Shipment)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.User, Role.Admin)
   async createShipment(
-    @Args('input') input: CreateShipmentInput, 
+    @Args('input') input: CreateShipmentInput,
     @Context() context: any
   ) {
-    const userId = context.req.user.userId; // Extract userId from the token
-    console.log('Creating shipment for user:', userId);
+    console.log('User from token:', context.req);
+    const user = context.req.user;
 
-    return this.shipmentService.create({ ...input, userId });
+    // Ensure the user is authenticated
+    if (!user) {
+      throw new UnauthorizedException('User is not authenticated');
+    }
+
+    // Proceed with shipment creation
+    return this.shipmentService.create({
+      ...input,
+    });
+  }
+
+  // Update a shipment (Admin only)
+  @Mutation(() => Shipment)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.Admin)
+  async updateShipment(
+    @Args('trackingNumber') trackingNumber: string,
+    @Args('input') input: UpdateShipmentInput,
+  ) {
+    const shipment = await this.shipmentService.findOne(trackingNumber);
+
+    if (!shipment) {
+      throw new Error('Shipment not found');
+    }
+
+    return this.shipmentService.update(trackingNumber, input);
+  }
+
+  // Delete a shipment (Admin only)
+  @Mutation(() => Boolean)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.Admin)
+  async deleteShipment(@Args('trackingNumber') trackingNumber: string): Promise<boolean> {
+    const shipment = await this.shipmentService.findOne(trackingNumber);
+
+    if (!shipment) {
+      throw new Error('Shipment not found');
+    }
+
+    await this.shipmentService.delete(trackingNumber);
+    return true;
   }
 }

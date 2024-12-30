@@ -1,32 +1,29 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, ExtractJwt } from 'passport-jwt';
-import { JwtService } from '@nestjs/jwt';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Shipment } from '../shipment.schema';  // Import your shipment schema
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(
-    private jwtService: JwtService,
-    @InjectModel(Shipment.name) private shipmentModel: Model<Shipment>,  // Inject the Shipment model
-  ) {
+  constructor() {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secretOrKey: process.env.JWT_SECRET,
+      ignoreExpiration: true,
     });
+
+    console.log('reaching the jwt strategy')
   }
 
   async validate(payload: any) {
-    // You can validate the JWT payload against the Shipment collection if needed
-    const shipment = await this.shipmentModel.findOne({ _id: payload.id });
-
-    if (!shipment) {
-      throw new Error('Shipment not found');
+    console.log('Token Payload Received: ......  ', payload);
+  
+    if (!payload || !payload.id || !payload.email) {
+      console.error('Invalid token payload:', payload);
+      throw new UnauthorizedException('Invalid token payload');
     }
-
-    // Return shipment or any user-related data you want to use
-    return shipment;
+  
+    // Return the user payload if valid
+    return { id: payload.id, email: payload.email, role:payload.role };
   }
+
 }

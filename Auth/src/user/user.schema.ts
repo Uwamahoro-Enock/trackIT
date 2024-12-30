@@ -20,6 +20,10 @@ export class User extends Document {
   @Field()
   password: string;
 
+  @Prop({ required: true, enum: ['Admin', 'User'], default: 'User' })
+  @Field()
+  role: string;
+
   @Prop({ default: Date.now })
   @Field()
   createdAt: Date;

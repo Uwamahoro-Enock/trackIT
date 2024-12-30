@@ -24,7 +24,7 @@ export class UserService {
   }
 
   async register(registerDto: RegisterDto): Promise<{ token: string }> {
-    const { name, email, password } = registerDto;
+    const { name, email, password,  role = 'localUser' } = registerDto;
 
     // Check if the email already exists
     const existingUser = await this.findByEmail(email);
@@ -36,11 +36,11 @@ export class UserService {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create new user
-    const newUser = await this.userModel.create({ name, email, password: hashedPassword });
+    const newUser = await this.userModel.create({ name, email, password: hashedPassword, role });
     await newUser.save();
 
     // Generate JWT token with user info (e.g., id and email)
-    const token = this.jwtService.sign({ id: newUser._id, email: newUser.email });
+    const token = this.jwtService.sign({ id: newUser._id, email: newUser.email, role: newUser.role });
 
     return { token };
   }
@@ -61,7 +61,7 @@ export class UserService {
     }
 
     // Generate JWT token
-    const token = this.jwtService.sign({ id: user._id, email: user.email });
+    const token = this.jwtService.sign({ id: user._id, email: user.email, role: user.role });
 
     return { token };
   }

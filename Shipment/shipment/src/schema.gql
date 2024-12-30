@@ -26,9 +26,19 @@ type Query {
 
 type Mutation {
   createShipment(input: CreateShipmentInput!): Shipment!
+  updateShipment(trackingNumber: String!, input: UpdateShipmentInput!): Shipment!
+  deleteShipment(trackingNumber: String!): Boolean!
 }
 
 input CreateShipmentInput {
+  trackingNumber: String!
+  status: String!
+  origin: String!
+  destination: String!
+  userId: String!
+}
+
+input UpdateShipmentInput {
   trackingNumber: String!
   status: String!
   origin: String!

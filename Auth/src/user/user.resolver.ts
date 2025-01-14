@@ -13,16 +13,14 @@ export class UserResolver {
   @Mutation(() => TokenResponse)
   async register(@Args('registerDto') registerDto: RegisterDto): Promise<TokenResponse> {
     const { token } = await this.userService.register(registerDto);
-    return { token };
+    return {token };
   }
 
 
   @Mutation(() => TokenResponse)
   async login(@Args('loginDto') loginDto: LoginDto): Promise<TokenResponse> {
     const { token } = await this.userService.login(loginDto);
-    console.log('Generated token:', token); // Add this log statement
-  console.log('User successfully logged in'); // You already have this log statement
-    console.log('user successfully logged in')
+    console.log('User successfully logged in')
     return { token };
   }
     

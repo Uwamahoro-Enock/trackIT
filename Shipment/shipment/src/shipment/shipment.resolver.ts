@@ -47,11 +47,11 @@ export class ShipmentResolver {
   async shipment(@Args('trackingNumber') trackingNumber: string) {
     return this.shipmentService.findOne(trackingNumber);
   }
-
+ 
   // Create a shipment (User or Admin)
   @Mutation(() => Shipment)
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.User, Role.Admin)
+  @Roles(Role.Admin)
   async createShipment(
     @Args('input') input: CreateShipmentInput,
     @Context() context: any

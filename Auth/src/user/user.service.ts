@@ -4,8 +4,9 @@ import { Model } from 'mongoose';
 import { User } from './user.schema';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { RegisterDto } from 'src/dto/register.dto';
-import { LoginDto } from 'src/dto/login.dto';
+import { RegisterDto } from '../dto/register.dto';
+import { LoginDto } from '../dto/login.dto';
+import { UserRequest, UserResponse } from '../generated/user_pb';
 
 @Injectable()
 export class UserService {
@@ -19,12 +20,16 @@ export class UserService {
     return this.userModel.findById(id).exec();
   }
 
+  async findAll(): Promise<User[]> {
+    return this.userModel.find().exec();
+  }
+
   async findByEmail(email: string): Promise<User | null> {
     return this.userModel.findOne({ email }).exec();
   }
 
   async register(registerDto: RegisterDto): Promise<{ token: string }> {
-    const { name, email, password,  role = 'localUser' } = registerDto;
+    const { name, email, password, role = 'localUser' } = registerDto;
 
     // Check if the email already exists
     const existingUser = await this.findByEmail(email);
@@ -64,5 +69,23 @@ export class UserService {
     const token = this.jwtService.sign({ id: user._id, email: user.email, role: user.role });
 
     return { token };
+  }
+
+  // gRPC-specific method to handle GetUser RPC
+  async getUser(request: UserRequest): Promise<UserResponse> {
+    const userId = request.getId(); // Extract user ID from the request
+    const user = await this.findById(userId); // Fetch user from the database
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // Create a UserResponse object
+    const response = new UserResponse();
+    response.setId(user._id.toString());
+    response.setName(user.name);
+    response.setEmail(user.email);
+
+    return response;
   }
 }

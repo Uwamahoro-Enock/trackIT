@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, Context, ResolveField, Parent } from '@nestjs/graphql';
 import { ShipmentService } from './shipment.service';
 import { Shipment } from './shipment.schema';
 import { UnauthorizedException, UseGuards, ForbiddenException } from '@nestjs/common';
@@ -9,9 +9,13 @@ import { CreateShipmentInput } from './dto/create-shipment.input';
 import { UpdateShipmentInput } from './dto/update-shipment.input';
 import { Role } from './dto/role.enum';
 
+
 @Resolver(() => Shipment)
 export class ShipmentResolver {
-  constructor(private readonly shipmentService: ShipmentService) {}
+  constructor(
+    private readonly shipmentService: ShipmentService,
+  ) {}
+
 
   // Get all shipments (Admin only)
   @Query(() => [Shipment])
@@ -30,7 +34,7 @@ export class ShipmentResolver {
     @Args('userId') userId: string,
     @Context() context: any
   ) {
-    const tokenUserId = context.req.user.userId; 
+    const tokenUserId = context.req.user.userId;
     const userRole = context.req.user.role;
     console.log('User ID from token:', tokenUserId);
 
@@ -47,7 +51,7 @@ export class ShipmentResolver {
   async shipment(@Args('trackingNumber') trackingNumber: string) {
     return this.shipmentService.findOne(trackingNumber);
   }
- 
+
   // Create a shipment (User or Admin)
   @Mutation(() => Shipment)
   @UseGuards(AuthGuard, RolesGuard)

@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package shipment;
+
+service ShipmentService {
+  rpc GetShipments (ShipmentRequest) returns (ShipmentResponse);
+}
+
+message ShipmentRequest {
+  string userId = 1;
+}
+
+message ShipmentResponse {
+  repeated Shipment shipments = 1;
+}
+
+message Shipment {
+  string id = 1;
+  string trackingNumber = 2;
+  string status = 3;
+  string origin = 4;
+  string destination = 5;
+  string createdAt = 6;
+  string userId = 7;
+  repeated string statusHistory = 8;
+  User user = 9;
+}
+
+message User {
+  string id = 1;
+  string name = 2;
+  string email = 3;
+}

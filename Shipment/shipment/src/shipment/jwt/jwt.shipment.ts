@@ -19,7 +19,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   
     if (!payload || !payload.id || !payload.email) {
       console.error('Invalid token payload:', payload);
-      throw new UnauthorizedException('Invalid token payload');
+      throw new UnauthorizedException('Invalid token. Please log in again');
     }
   
     // Return the user payload if valid

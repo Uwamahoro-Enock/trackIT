@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Field, ObjectType, ID } from '@nestjs/graphql';
+import { Field, ObjectType, ID, Directive } from '@nestjs/graphql';
 import { Document } from 'mongoose';
 
 @ObjectType()
@@ -10,7 +10,7 @@ export class Shipment extends Document {
   id: string;
 
   @Field()
-  @Prop({ required: true })
+  @Prop({ required: true, unique: true })
   trackingNumber: string;
 
   @Field()
@@ -30,11 +30,11 @@ export class Shipment extends Document {
   createdAt: Date;
 
   @Field()
-  @Prop({required: true})
-  userId: string	
+  @Prop({ required: true })
+  userId: string;
 
   @Field(() => [String])
-  @Prop({type: [String], default: []})
+  @Prop({ type: [String], default: [] })
   statusHistory: string[];
 }
 
